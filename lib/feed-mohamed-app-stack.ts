@@ -5,6 +5,8 @@ import { HitCounter } from './hitcounter';
 import { Construct } from 'constructs';
 
 export class FeedMohamedAppStack extends cdk.Stack {
+  public readonly hcEndpoint: cdk.CfnOutput;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -18,8 +20,12 @@ export class FeedMohamedAppStack extends cdk.Stack {
       downstream: hello
     });
 
-    new apigw.LambdaRestApi(this, 'Endpoint', {
+    const gateway = new apigw.LambdaRestApi(this, 'Endpoint', {
       handler: helloWithCounter.handler
+    });
+
+    this.hcEndpoint = new cdk.CfnOutput(this, 'GatewayUrl', {
+      value: gateway.url
     });
   }
 }
