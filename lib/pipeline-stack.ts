@@ -27,5 +27,19 @@ export class PipelineStack extends cdk.Stack {
 
         const deploy = new PipelineStage(this, 'Deploy');
         const deployStage = pipeline.addStage(deploy);
+
+        deployStage.addPost(
+            new  CodeBuildStep('TestAPIGatewayEndpoint', {
+                projectName: 'TestAPIGatewayEndpoint',
+                envFromCfnOutputs: {
+                    ENDPOINT_URL: deploy.hcEndpoint
+                },
+                commands: [
+                    'curl -Ssf $ENDPOINT_URL',
+                    'curl -Ssf $ENDPOINT_URL/hello',
+                    'curl -Ssf $ENDPOINT_URL/test'
+                ]
+            })
+        )
     }
 }
